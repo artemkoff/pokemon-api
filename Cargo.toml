@@ -2,7 +2,13 @@
 name = "pokemon-api"
 version = "0.1.0"
 authors = ["Artem Korotkov <ars.korotkov@gmail.com>"]
+description = "PokeApi v2 wrapper"
+homepage = "https://github.com/artemkoff/pokemon-api"
+repository = "https://github.com/artemkoff/pokemon-api"
 edition = "2018"
+license = "MIT"
+keywords = ["pokemon", "api", "poke", "pokeapi"]
+include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
