@@ -1,9 +1,9 @@
-use super::resource::*;
+use super::client::ApiClient;
 use super::endpoint::ApiEndpoint;
+use super::resource::*;
 use crate::models::v2::berries::Berry;
 use crate::models::v2::resource::NamedResourceList;
 use crate::Result;
-use super::client::ApiClient;
 
 /// Berries API endpoint. For details see [pokeapi/berries](https://pokeapi.co/docs/v2.html#berries-section)
 /// Represents the endpoint `https://pokeapi.co/api/v2/berry`
@@ -30,7 +30,6 @@ impl ApiEndpoint for BerryApiEndpoint {
 }
 
 impl BerryApiEndpoint {
-
     /// Creates API Endpoint object
     pub(crate) fn new(client: ApiClient) -> Self {
         Self { client }
@@ -45,21 +44,20 @@ decl_named_resource_list!(BerryNamedResourceList for Berry with BerryNamedResour
 #[cfg(test)]
 #[allow(dead_code)]
 mod test {
-    use crate::api::v2::client::ApiClient;
-    use crate::api::v2::resource::{ ApiResource, ApiNamedResourceList};
-    use crate::api::v2::endpoint::ApiEndpoint;
-    use crate::models::v2::resource::{Resource, NamedResource, NamedResourceList};
     use crate::api::v2::berries::{
-        BerryApiEndpoint,
-        BerryResource,
-        BerryNamedResource,
-        BerryNamedResourceList
+        BerryApiEndpoint, BerryNamedResource, BerryNamedResourceList, BerryResource,
     };
+    use crate::api::v2::client::ApiClient;
+    use crate::api::v2::endpoint::ApiEndpoint;
+    use crate::api::v2::resource::{ApiNamedResourceList, ApiResource};
+    use crate::models::v2::resource::{NamedResource, NamedResourceList, Resource};
 
     #[tokio::test]
     async fn berry_resource() {
         let client = ApiClient::new().unwrap();
-        let resource = Resource { url: "https://pokeapi.co/api/v2/berry/1".into() };
+        let resource = Resource {
+            url: "https://pokeapi.co/api/v2/berry/1".into(),
+        };
 
         let berry_resource = BerryResource::new(client, resource);
 
@@ -96,12 +94,27 @@ mod test {
             next: Some("https://pokeapi.co/api/v2/berry?offset=5&limit=5".into()),
             previous: None,
             results: vec![
-                NamedResource { name: "cheri".into(), url: "https://pokeapi.co/api/v2/berry/1/".into() },
-                NamedResource { name: "chesto".into(), url: "https://pokeapi.co/api/v2/berry/2/".into() },
-                NamedResource { name: "pecha".into(), url: "https://pokeapi.co/api/v2/berry/3/".into() },
-                NamedResource { name: "rawst".into(), url: "https://pokeapi.co/api/v2/berry/4/".into() },
-                NamedResource { name: "aspear".into(), url: "https://pokeapi.co/api/v2/berry/5/".into() }
-            ]
+                NamedResource {
+                    name: "cheri".into(),
+                    url: "https://pokeapi.co/api/v2/berry/1/".into(),
+                },
+                NamedResource {
+                    name: "chesto".into(),
+                    url: "https://pokeapi.co/api/v2/berry/2/".into(),
+                },
+                NamedResource {
+                    name: "pecha".into(),
+                    url: "https://pokeapi.co/api/v2/berry/3/".into(),
+                },
+                NamedResource {
+                    name: "rawst".into(),
+                    url: "https://pokeapi.co/api/v2/berry/4/".into(),
+                },
+                NamedResource {
+                    name: "aspear".into(),
+                    url: "https://pokeapi.co/api/v2/berry/5/".into(),
+                },
+            ],
         };
 
         let berry_named_resource_list = BerryNamedResourceList::new(client, resource_list.clone());
@@ -133,7 +146,7 @@ mod test {
         let berry_api = BerryApiEndpoint::new(ApiClient::new().unwrap());
 
         assert_eq!(BerryApiEndpoint::name(), "berry");
-        
+
         {
             let cheri = {
                 let res = berry_api.get_by_id(1).await;

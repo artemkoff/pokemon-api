@@ -7,7 +7,6 @@ use super::resource::NamedResource;
 /// Check out Bulbapedia for greater detail.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Berry {
-
     /// The identifier for this resource.
     pub id: i32,
 

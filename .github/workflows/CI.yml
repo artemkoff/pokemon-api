@@ -6,8 +6,32 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  RUST_BACKTRACE: 1
+
 jobs:
+  check-style:
+    name: Check style
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          components: rustfmt
+          profile: minimal
+          override: true
+
+      - name: cargo fmt -- --check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+
   build-and-test:
+    name: ${{ matrix.name }}
+    needs: [style]
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]

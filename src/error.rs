@@ -1,5 +1,5 @@
-use thiserror::Error as ThisError;
 use reqwest::Error as ReqError;
+use thiserror::Error as ThisError;
 
 pub type Result<T> = std::result::Result<T, Error>;
 
@@ -10,4 +10,3 @@ pub enum Error {
     #[error("Unknown api error")]
     Unknown,
 }
-
