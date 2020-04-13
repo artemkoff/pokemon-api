@@ -30,7 +30,7 @@ jobs:
           args: -- --check
 
   build-and-test:
-    name: ${{ matrix.name }}
+    name: build-${{ matrix.os }}-${{ matrix-rust }}
     needs: [check-style]
     strategy:
       matrix:
