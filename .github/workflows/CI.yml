@@ -6,13 +6,12 @@ on:
   pull_request:
     branches: [ master ]
 
-strategy:
-  matrix:
-    os: [ubuntu-latest, macos-latest, windows-latest]
-    rust: [stable, nightly]
-
 jobs:
   build-and-test:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        rust: [stable, nightly]
 
     runs-on: ${{ matrix.os }}
 
