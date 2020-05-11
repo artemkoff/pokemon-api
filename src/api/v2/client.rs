@@ -2,7 +2,7 @@ use reqwest::Client as ReqClient;
 use reqwest::ClientBuilder;
 use reqwest::Response;
 
-use crate::api::v2::berries::BerryApiEndpoint;
+use crate::api::v2::berry::BerryEndpoint;
 use crate::api::POKE_API_BASE_URL;
 use crate::api::POKE_API_CLIENT_NAME;
 use crate::Result;
@@ -32,8 +32,8 @@ impl ApiClient {
     }
 
     /// Access to berries API enpoint
-    pub fn berries(&self) -> BerryApiEndpoint {
-        BerryApiEndpoint::new(self.clone())
+    pub fn berries(&self) -> BerryEndpoint {
+        BerryEndpoint::new(self.clone())
     }
 }
 

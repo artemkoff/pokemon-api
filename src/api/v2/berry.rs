@@ -1,18 +1,18 @@
 use super::client::ApiClient;
 use super::endpoint::ApiEndpoint;
 use super::resource::*;
-use crate::models::v2::berries::Berry;
+use crate::models::v2::berry::{Berry, BerryFirmness};
 use crate::models::v2::resource::NamedResourceList;
 use crate::Result;
 
 /// Berries API endpoint. For details see [pokeapi/berries](https://pokeapi.co/docs/v2.html#berries-section)
 /// Represents the endpoint `https://pokeapi.co/api/v2/berry`
 #[derive(Clone)]
-pub struct BerryApiEndpoint {
+pub struct BerryEndpoint {
     client: ApiClient,
 }
 
-impl ApiEndpoint for BerryApiEndpoint {
+impl ApiEndpoint for BerryEndpoint {
     type Model = Berry;
     type NamedResourceList = BerryNamedResourceList;
 
@@ -29,7 +29,7 @@ impl ApiEndpoint for BerryApiEndpoint {
     }
 }
 
-impl BerryApiEndpoint {
+impl BerryEndpoint {
     /// Creates API Endpoint object
     pub(crate) fn new(client: ApiClient) -> Self {
         Self { client }
@@ -41,11 +41,48 @@ decl_named_resource!(BerryNamedResource for Berry);
 decl_resource_list!(BerryResourceList for Berry with BerryResource);
 decl_named_resource_list!(BerryNamedResourceList for Berry with BerryNamedResource);
 
+/// Berry Firmness API endpoint. For details see [pokeapi/berry-firmnesses](https://pokeapi.co/docs/v2.html/#berry-firmnesses)
+/// Represents the endpoint `https://pokeapi.co/api/v2/berry-firmnesses`
+#[derive(Clone)]
+pub struct BerryFirmnessEndpoint {
+    client: ApiClient,
+}
+
+impl ApiEndpoint for BerryFirmnessEndpoint {
+    type Model = BerryFirmness;
+    type NamedResourceList = BerryFirmnessNamedResourceList;
+
+    fn client(&self) -> &ApiClient {
+        &self.client
+    }
+
+    fn name() -> &'static str {
+        "berry-firmness"
+    }
+
+    fn create_named_resource_list(&self, model: NamedResourceList) -> Self::NamedResourceList {
+        BerryFirmnessNamedResourceList::new(self.client().clone(), model)
+    }
+}
+
+impl BerryFirmnessEndpoint {
+    pub(crate) fn new(client: ApiClient) -> Self {
+        Self { client }
+    }
+}
+
+decl_resource!(BerryFirmnessResource for BerryFirmness);
+decl_named_resource!(BerryFirmnessNamedResource for BerryFirmness);
+decl_resource_list!(BerryFirmnessResourceList for BerryFirmness with BerryFirmnessResource);
+decl_named_resource_list!(BerryFirmnessNamedResourceList for BerryFirmness with BerryFirmnessNamedResource);
+
 #[cfg(test)]
 #[allow(dead_code)]
 mod test {
-    use crate::api::v2::berries::{
-        BerryApiEndpoint, BerryNamedResource, BerryNamedResourceList, BerryResource,
+    use crate::api::v2::berry::{
+        BerryEndpoint, BerryFirmnessEndpoint, BerryFirmnessNamedResource,
+        BerryFirmnessNamedResourceList, BerryFirmnessResource, BerryNamedResource,
+        BerryNamedResourceList, BerryResource,
     };
     use crate::api::v2::client::ApiClient;
     use crate::api::v2::endpoint::ApiEndpoint;
@@ -143,9 +180,9 @@ mod test {
 
     #[tokio::test]
     async fn berry_api_get_by_id() {
-        let berry_api = BerryApiEndpoint::new(ApiClient::new().unwrap());
+        let berry_api = BerryEndpoint::new(ApiClient::new().unwrap());
 
-        assert_eq!(BerryApiEndpoint::name(), "berry");
+        assert_eq!(BerryEndpoint::name(), "berry");
 
         {
             let cheri = {
@@ -172,9 +209,9 @@ mod test {
 
     #[tokio::test]
     async fn berry_api_get_by_name() {
-        let berry_api = BerryApiEndpoint::new(ApiClient::new().unwrap());
+        let berry_api = BerryEndpoint::new(ApiClient::new().unwrap());
 
-        assert_eq!(BerryApiEndpoint::name(), "berry");
+        assert_eq!(BerryEndpoint::name(), "berry");
 
         {
             let cheri = {
@@ -197,5 +234,22 @@ mod test {
             assert_eq!(pecha.name, "pecha");
             assert_eq!(pecha.id, 3);
         }
+    }
+
+    #[tokio::test]
+    async fn berry_firmness_resource() {
+        let client = ApiClient::new().unwrap();
+        let resource = Resource {
+            url: "https://pokeapi.co/api/v2/berry-firmness/1".into(),
+        };
+
+        let berry_firmness_resource = BerryFirmnessResource::new(client, resource);
+
+        let berry_firmness = berry_firmness_resource.get().await;
+
+        assert!(berry_firmness.is_ok(), true);
+
+        let berry_firmness = berry_firmness.unwrap();
+        assert_eq!(berry_firmness.id, 1);
     }
 }
