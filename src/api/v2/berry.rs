@@ -120,6 +120,10 @@ mod test {
         let berry = named_berry_resource.get().await;
 
         assert_eq!(berry.is_ok(), true);
+        let berry = berry.unwrap();
+
+        assert_eq!(berry.id, 1);
+        assert_eq!(berry.name, "cheri");
     }
 
     #[tokio::test]
@@ -251,5 +255,132 @@ mod test {
 
         let berry_firmness = berry_firmness.unwrap();
         assert_eq!(berry_firmness.id, 1);
+    }
+
+    #[tokio::test]
+    async fn berry_firmness_named_resource() {
+        let client = ApiClient::new().unwrap();
+        let resource = NamedResource {
+            name: "very-soft".to_string(),
+            url: "https://pokeapi.co/api/v2/berry-firmness/1".to_string()
+        };
+
+        let firmness_named_resource = BerryFirmnessNamedResource::new(client.clone(), resource);
+
+        let berry_firmness = firmness_named_resource.get().await;
+
+        assert_eq!(berry_firmness.is_ok(), true);
+        let berry_firmness = berry_firmness.unwrap();
+
+        assert_eq!(berry_firmness.id, 1);
+        assert_eq!(berry_firmness.name, "very-soft");
+    }
+
+    #[tokio::test]
+    async fn berry_firmness_named_resource_list() {
+        let client = ApiClient::new().unwrap();
+
+        let resource_list = NamedResourceList {
+            count: 5,
+            next: None,
+            previous: None,
+            results: vec![
+                NamedResource {
+                    name: "very-soft".into(),
+                    url: "https://pokeapi.co/api/v2/berry-firmness/1/".into(),
+                },
+                NamedResource {
+                    name: "soft".into(),
+                    url: "https://pokeapi.co/api/v2/berry-firmness/2/".into(),
+                },
+                NamedResource {
+                    name: "hard".into(),
+                    url: "https://pokeapi.co/api/v2/berry-firmness/3/".into(),
+                },
+                NamedResource {
+                    name: "very-hard".into(),
+                    url: "https://pokeapi.co/api/v2/berry-firmness/4/".into(),
+                },
+                NamedResource {
+                    name: "super-hard".into(),
+                    url: "https://pokeapi.co/api/v2/berry-firmness/5/".into(),
+                },
+            ],
+        };
+
+        let named_resource_list = BerryFirmnessNamedResourceList::new(client.clone(), resource_list.clone());
+
+        assert_eq!(named_resource_list.count(), 5);
+
+        let prev_list = named_resource_list.previous_list().await;
+        assert_eq!(prev_list.is_ok(), true);
+        assert_eq!(prev_list.unwrap().is_none(), true);
+
+        let next_lit = named_resource_list.next_list().await;
+        assert_eq!(next_lit.is_ok(), true);
+        assert_eq!(next_lit.unwrap().is_none(), true);
+
+        let resources = named_resource_list.resources();
+        for (idx, resource) in resources.iter().enumerate() {
+            assert_eq!(resource.name(), resource_list.results[idx].name);
+            assert_eq!(resource.url(), resource_list.results[idx].url);
+
+            let firmness = resource.get().await;
+            assert_eq!(firmness.is_ok(), true);
+            let firmness = firmness.unwrap();
+
+            assert_eq!(firmness.id as usize, idx + 1);
+            assert_eq!(firmness.name, resource.name());
+        }
+    }
+
+    #[tokio::test]
+    async fn firmness_api_get_by_id() {
+        let firmness_api = BerryFirmnessEndpoint::new(ApiClient::new().unwrap());
+
+        assert_eq!(BerryFirmnessEndpoint::name(), "berry-firmness");
+
+        {
+            let very_soft = firmness_api.get_by_id(1).await;
+            assert_eq!(very_soft.is_ok(), true);
+            let very_soft = very_soft.unwrap();
+
+            assert_eq!(very_soft.id, 1);
+            assert_eq!(very_soft.name, "very-soft")
+        }
+
+        {
+            let super_hard = firmness_api.get_by_id(5).await;
+            assert_eq!(super_hard.is_ok(), true);
+            let super_hard = super_hard.unwrap();
+
+            assert_eq!(super_hard.id, 5);
+            assert_eq!(super_hard.name, "super-hard");
+        }
+    }
+
+    #[tokio::test]
+    async fn firmness_api_get_by_name() {
+        let firmness_api = BerryFirmnessEndpoint::new(ApiClient::new().unwrap());
+
+        assert_eq!(BerryFirmnessEndpoint::name(), "berry-firmness");
+
+        {
+            let very_soft = firmness_api.get_by_name("very-soft").await;
+            assert_eq!(very_soft.is_ok(), true);
+            let very_soft = very_soft.unwrap();
+
+            assert_eq!(very_soft.id, 1);
+            assert_eq!(very_soft.name, "very-soft");
+        }
+
+        {
+            let hard = firmness_api.get_by_name("hard").await;
+            assert_eq!(hard.is_ok(), true);
+            let hard = hard.unwrap();
+
+            assert_eq!(hard.id, 3);
+            assert_eq!(hard.name, "hard");
+        }
     }
 }
