@@ -262,7 +262,7 @@ mod test {
         let client = ApiClient::new().unwrap();
         let resource = NamedResource {
             name: "very-soft".to_string(),
-            url: "https://pokeapi.co/api/v2/berry-firmness/1".to_string()
+            url: "https://pokeapi.co/api/v2/berry-firmness/1".to_string(),
         };
 
         let firmness_named_resource = BerryFirmnessNamedResource::new(client.clone(), resource);
@@ -308,7 +308,8 @@ mod test {
             ],
         };
 
-        let named_resource_list = BerryFirmnessNamedResourceList::new(client.clone(), resource_list.clone());
+        let named_resource_list =
+            BerryFirmnessNamedResourceList::new(client.clone(), resource_list.clone());
 
         assert_eq!(named_resource_list.count(), 5);
 
